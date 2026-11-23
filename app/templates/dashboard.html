@@ -1,0 +1,6 @@
+{% extends 'base.html' %}{% block content %}
+<h2>Dashboard</h2>
+{% for s in statuses %}<div class='card'><div>{{ s }}</div><h1>{{ counts.get(s, 0) }}</h1></div>{% endfor %}
+<h3>Recent tickets</h3>
+<ul>{% for t in recent %}<li><a href='/tickets/{{ t.id }}'>#{{ t.id }} {{ t.title }}</a> ({{ t.status }})</li>{% else %}<li>No tickets yet</li>{% endfor %}</ul>
+{% endblock %}

@@ -1,0 +1,4 @@
+# Copy to terraform.tfvars (git-ignored) and fill in real values.
+alert_email  = "team-email@example.com"
+github_repo  = "<owner>/ticketdesk"
+state_bucket = "ticketdesk-tfstate-<yourname>-<digits>"

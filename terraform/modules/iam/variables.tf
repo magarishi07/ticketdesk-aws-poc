@@ -1,0 +1,11 @@
+variable "project" {}
+variable "region" {}
+variable "secret_arn" {}
+variable "attachments_bucket_arn" {}
+variable "ecr_repo_arn" {}
+variable "app_log_group_arn" {}
+variable "frontend_bucket_arn" {}
+variable "distribution_arn" {}
+variable "instance_arn" {}
+variable "github_repo" {}
+variable "state_bucket" {}

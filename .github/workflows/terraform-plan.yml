@@ -1,0 +1,35 @@
+name: Terraform plan
+on:
+  pull_request:
+    paths: ['terraform/**']
+permissions:
+  id-token: write      # needed for OIDC
+  contents: read
+  pull-requests: write # to post the plan as a comment
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_alert_email: ${{ vars.ALERT_EMAIL }}
+      TF_VAR_github_repo: ${{ github.repository }}
+      TF_VAR_state_bucket: ${{ vars.STATE_BUCKET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_PLAN_ROLE_ARN }}
+          aws-region: ap-south-1
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform -chdir=terraform init -input=false
+      - name: Plan
+        run: terraform -chdir=terraform plan -no-color -input=false > plan.txt 2>&1 || (cat plan.txt; exit 1)
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const plan = fs.readFileSync('plan.txt', 'utf8').slice(-60000);
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              body: '### Terraform plan\n```\n' + plan + '\n```'
+            });

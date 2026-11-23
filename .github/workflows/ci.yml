@@ -1,0 +1,53 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+
+jobs:
+  app-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r app/requirements.txt -r requirements-dev.txt
+      - run: ruff check app lambda tests
+      - run: cd app && python -m pytest ../tests/unit -v
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # scan the whole history, not just the last commit
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  terraform-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform -chdir=terraform fmt -check -recursive
+      - run: terraform -chdir=terraform init -backend=false
+      - run: terraform -chdir=terraform validate
+      - uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: terraform
+          soft_fail: true # report findings without blocking
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t ticketdesk:ci .
+      - uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ticketdesk:ci
+          severity: CRITICAL,HIGH
+          exit-code: '0'

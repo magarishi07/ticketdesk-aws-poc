@@ -1,0 +1,12 @@
+output "app_url" { value = "https://${module.cdn.domain_name}" }
+output "instance_id" { value = module.compute.instance_id }
+output "ec2_public_dns" { value = module.compute.public_dns }
+output "ecr_repo_url" { value = module.storage.ecr_repo_url }
+output "bucket_name" { value = module.storage.attachments_bucket_name }
+output "frontend_bucket" { value = module.cdn.frontend_bucket_name }
+output "distribution_id" { value = module.cdn.distribution_id }
+output "secret_name" { value = module.database.secret_name }
+output "db_address" { value = module.database.db_address }
+output "dlq_name" { value = module.serverless.dlq_name }
+output "deploy_role_arn" { value = module.iam.deploy_role_arn }
+output "plan_role_arn" { value = module.iam.plan_role_arn }

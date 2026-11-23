@@ -1,0 +1,56 @@
+name: Deploy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
+concurrency: deploy-production # never two deploys at once
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production # pauses here until a reviewer approves
+    env:
+      AWS_REGION: ap-south-1
+      REPO: ${{ vars.ECR_REPOSITORY_URL }}
+      TAG: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        run: |
+          docker build -t $REPO:$TAG -t $REPO:latest .
+          docker push $REPO:$TAG
+          docker push $REPO:latest
+
+      - name: Upload frontend files
+        run: |
+          aws s3 sync app/static s3://${{ vars.FRONTEND_BUCKET }}/static --delete
+          aws cloudfront create-invalidation --distribution-id ${{ vars.CLOUDFRONT_ID }} --paths '/static/*'
+
+      - name: Roll out on EC2
+        run: |
+          CMD_ID=$(aws ssm send-command \
+            --instance-ids ${{ vars.INSTANCE_ID }} \
+            --document-name AWS-RunShellScript \
+            --comment "deploy $TAG" \
+            --parameters "commands=[\"/usr/local/bin/ticketdesk-deploy $TAG\"]" \
+            --query Command.CommandId --output text)
+          aws ssm wait command-executed --command-id $CMD_ID --instance-id ${{ vars.INSTANCE_ID }}
+
+      - name: Smoke test
+        run: |
+          for i in 1 2 3 4 5 6; do
+            curl -sf https://${{ vars.APP_DOMAIN }}/health && exit 0
+            sleep 10
+          done
+          echo "Health check failed" && exit 1

@@ -1,0 +1,14 @@
+.git
+.github
+terraform
+tests
+docs
+lambda
+scripts
+**/.venv
+**/__pycache__
+**/*.pyc
+.env
+app/.env
+app/uploads
+test.db

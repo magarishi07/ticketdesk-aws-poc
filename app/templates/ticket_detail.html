@@ -1,0 +1,10 @@
+{% extends 'base.html' %}{% block content %}
+<h2>#{{ t.id }} {{ t.title }}</h2>
+<p><b>Status:</b> {{ t.status }} | <b>Priority:</b> {{ t.priority }} | <b>Raised by:</b> {{ t.creator.username }}</p>
+<p>{{ t.description }}</p>
+{% if next_status %}<form method='post' action='/tickets/{{ t.id }}/status'><button>Move to {{ next_status }}</button></form>{% endif %}
+<h3>Attachments</h3>
+<ul>{% for a, link in files %}<li><a href='{{ link }}' target='_blank'>{{ a.filename }}</a></li>{% else %}<li>None</li>{% endfor %}</ul>
+<form method='post' action='/tickets/{{ t.id }}/attachments' enctype='multipart/form-data'>
+  <input type='file' name='file' required> <button>Upload</button>
+</form>{% endblock %}

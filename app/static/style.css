@@ -1,0 +1,6 @@
+body{font-family:sans-serif;max-width:900px;margin:auto;padding:16px}
+nav a{margin-right:12px}
+table{border-collapse:collapse;width:100%}
+td,th{border:1px solid #ccc;padding:6px;text-align:left}
+.card{display:inline-block;border:1px solid #ccc;border-radius:8px;padding:12px;margin:4px;min-width:130px}
+.error{color:#b00020}

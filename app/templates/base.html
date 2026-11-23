@@ -1,0 +1,8 @@
+<!doctype html>
+<html><head><meta charset='utf-8'><title>TicketDesk</title>
+<link rel='stylesheet' href='/static/style.css'>
+</head><body>
+{% if user %}<nav><b>TicketDesk</b> <a href='/'>Dashboard</a><a href='/tickets'>Tickets</a>
+<a href='/tickets/new'>New ticket</a><a href='/logout'>Logout ({{ user.username }})</a></nav><hr>{% endif %}
+{% block content %}{% endblock %}
+</body></html>
