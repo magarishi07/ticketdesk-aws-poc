@@ -18,7 +18,7 @@ variable "db_instance_class" {
 }
 
 variable "github_repo" {
-  description = "GitHub repository as owner/repo, e.g. person1/ticketdesk (case-sensitive)"
+  description = "GitHub repo in OIDC subject form: owner@ownerId/repo@repoId (GitHub immutable-ID subject claims)"
 }
 
 variable "state_bucket" {
