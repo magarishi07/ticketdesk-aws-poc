@@ -100,14 +100,14 @@ resource "aws_cloudwatch_dashboard" "main" {
       {
         type = "metric", x = 0, y = 0, width = 12, height = 6
         properties = {
-          title = "EC2 CPU %", region = var.region, stat = "Average", period = 300
+          title   = "EC2 CPU %", region = var.region, stat = "Average", period = 300
           metrics = [["AWS/EC2", "CPUUtilization", "InstanceId", var.instance_id]]
         }
       },
       {
         type = "metric", x = 12, y = 0, width = 12, height = 6
         properties = {
-          title = "RDS connections", region = var.region, stat = "Average", period = 300
+          title   = "RDS connections", region = var.region, stat = "Average", period = 300
           metrics = [["AWS/RDS", "DatabaseConnections", "DBInstanceIdentifier", var.db_identifier]]
         }
       },
@@ -124,7 +124,7 @@ resource "aws_cloudwatch_dashboard" "main" {
       {
         type = "metric", x = 12, y = 6, width = 12, height = 6
         properties = {
-          title = "App errors and failed logins", region = var.region, stat = "Sum", period = 300
+          title   = "App errors and failed logins", region = var.region, stat = "Sum", period = 300
           metrics = [["TicketDesk", "AppErrors"], ["TicketDesk", "FailedLogins"]]
         }
       }
