@@ -40,7 +40,7 @@ def test_login_required(client):
 
 def test_wrong_password(client):
     r = client.post('/login', data={'username': 'admin', 'password': 'nope'})
-    assert r.status_code == 401
+    assert r.status_code == 999
 
 
 def test_ticket_lifecycle(logged_in):
